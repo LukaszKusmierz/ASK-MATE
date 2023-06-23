@@ -2,7 +2,6 @@ import connection
 import util
 
 
-
 @connection.connection_handler
 def get_sorted_questions(cursor, order_by, order_direction):
     order = "ASC" if order_direction.upper() == "ASC" else "DESC"
@@ -18,7 +17,7 @@ def get_sorted_questions(cursor, order_by, order_direction):
     """)
     return cursor.fetchall()
 
-  
+
 @connection.connection_handler
 def get_question_data_by_id_dm(cursor, question_id):
     cursor.execute("""
@@ -27,7 +26,6 @@ def get_question_data_by_id_dm(cursor, question_id):
         WHERE id = %(question_id)s;
         """, {'question_id': question_id})
     return cursor.fetchone()
-
 
 
 @connection.connection_handler
@@ -39,7 +37,6 @@ def view_question_dm(cursor, question_id):
         """, {'question_id': question_id})
 
 
-    
 @connection.connection_handler
 def get_answers_by_question_id_dm(cursor, question_id):
     cursor.execute("""
@@ -49,6 +46,16 @@ def get_answers_by_question_id_dm(cursor, question_id):
         ORDER BY submission_time DESC;
         """, {'question_id': question_id})
     return cursor.fetchall()
+
+
+@connection.connection_handler
+def get_answer_by_id(cursor, answer_id):
+    cursor.execute("""
+        SELECT *
+        FROM answer
+        WHERE id = %(answer_id)s
+        """, {'answer_id': answer_id})
+    return cursor.fetchone()
 
 
 @connection.connection_handler
@@ -112,7 +119,7 @@ def delete_question_dm(cursor, question_id):
         """, {'question_id': question_id})
     util.delete_image_files(image_paths)
 
-    
+
 @connection.connection_handler
 def get_image_paths(cursor, question_id):
     cursor.execute("""
@@ -127,7 +134,6 @@ def get_image_paths(cursor, question_id):
     images = cursor.fetchall()
     image_paths = [image['image'] for image in images]
     return image_paths
-
 
 
 @connection.connection_handler
@@ -171,24 +177,20 @@ def update_question_dm(cursor, title, message, old_image_path, new_image_file, q
 
 
 @connection.connection_handler
-def update_answer_dm(cursor, title, message, old_image_path, new_image_file, answer_id, remove_image):
-    if remove_image:
-        util.delete_image_files(old_image_path)
-    if new_image_file.filename != '':
-        new_image_path = util.save_image(new_image_file)
-    if remove_image and new_image_file.filename == '':
-        new_image_path = old_image_path
+def update_answer(cursor, message, answer_id, image_file):
+    image_path = None
+    if image_file.filename != '':
+        image_path = util.save_image(image_file)
     cursor.execute("""
         UPDATE answer
         SET
-            title = %(title)s,
             message = %(message)s,
-            image = %(image)s
+            image = %(image_path)s
         WHERE id = %(answer_id)s;""",
-                    {'title': title,
-                    'message': message,
-                    'image': new_image_path,
+                   {'message': message,
+                    'image_path': image_path,
                     'answer_id': answer_id})
+
 
 @connection.connection_handler
 def vote_on_question_dm(cursor, question_id, vote_direction):
@@ -201,7 +203,6 @@ def vote_on_question_dm(cursor, question_id, vote_direction):
         END
         WHERE id = %(question_id)s;
     """, {'question_id': question_id, 'vote_direction': vote_direction})
-  
 
 
 @connection.connection_handler
@@ -218,33 +219,35 @@ def vote_on_answer_dm(cursor, answer_id, vote_direction):
     """, {'answer_id': answer_id, 'vote_direction': vote_direction})
     question_id = cursor.fetchone()['question_id']
     return question_id
-  
-  
+
+
 @connection.connection_handler
 def get_comments_by_question_id_dm(cursor, question_id):
-    query="""
+    query = """
             SELECT *
             FROM comment
             WHERE question_id = %(question_id)s
             ORDER BY submission_time DESC;
             """
-    cursor.execute(query,{'question_id': question_id})
+    cursor.execute(query, {'question_id': question_id})
     return cursor.fetchall()
-  
-  
+
+
 @connection.connection_handler
-def add_comment_question(cursor,question_id, message):
+def add_comment_question(cursor, question_id, message):
     submission_time = util.get_time()
-    query ="""
+    query = """
             INSERT INTO comment(question_id, message,submission_time, edited_count)
             VALUES (%(question_id)s, %(message)s, %(submission_time)s, %(edited_count)s);
             """
-    cursor.execute(query,{'question_id':question_id,'message': message,'submission_time': submission_time, 'edited_count':0})
+    cursor.execute(query, {'question_id': question_id, 'message': message, 'submission_time': submission_time,
+                           'edited_count': 0})
 
 
 @connection.connection_handler
-def edit_comment_dm(cursor,question_id, message):
+def edit_comment_dm(cursor, question_id, message):
     pass
+
 
 @connection.connection_handler
 def get_comments_to_answers_dm(cursor, question_id):
@@ -299,4 +302,3 @@ def add_comment_to_answer_dm(cursor, answer_id, message):
 #                   'tag':tag})
 #     tags = cursor.fetchall()
 #     return tags
-

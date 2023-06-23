@@ -25,11 +25,11 @@
     </form></p>
 
 
-    <form action='/answer/{{answer_id}}/edit' method="POST" enctype="multipart/form-data">
+    <form action='/answer/{{answer.id}}/edit' method="POST" enctype="multipart/form-data">
 
         <div>
             <label for="message">Answer:</label>
-            <textarea id="message" name="message" required>{{ answer_id }}</textarea>
+            <textarea id="message" name="message" required>{{answer['message']}}</textarea>
         </div>
         <div>
             <label for="image">Image:</label>
