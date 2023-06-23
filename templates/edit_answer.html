@@ -16,15 +16,20 @@
         }
     </style>
 </head>
-<body>
+<p>
     <h2>Edit Answer</h2>
-    <p><a href="/question/{{question_id}}">Go back</a></p>
+    <p><form>
+        <input type="button"
+               value="Go Back"
+               onclick="history.back('/question/{{question_id}}')">
+    </form></p>
+
 
     <form action='/answer/{{answer_id}}/edit' method="POST" enctype="multipart/form-data">
 
         <div>
             <label for="message">Answer:</label>
-            <textarea id="message" name="message" required>{{ message }}</textarea>
+            <textarea id="message" name="message" required>{{ answer_id }}</textarea>
         </div>
         <div>
             <label for="image">Image:</label>

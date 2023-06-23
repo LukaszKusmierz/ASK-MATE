@@ -158,8 +158,15 @@ def add_comment_to_answer(answer_id):
     elif flask.request.method == 'GET':
         return flask.render_template('add_comment.html', answer_id=answer_id)
 
-      
-    # @app.route('/answer/<answer_id>/edit', methods=['GET', 'POST'])
+
+@app.route('/answer/<answer_id>/edit', methods=['GET', 'POST'])
+def edit_answers(answer_id):
+    answer = data_manager.get_answers_by_question_id_dm(answer_id)
+    return flask.render_template('edit_answer.html', message=answer)
+
+
+
+# @app.route('/answer/<answer_id>/edit', methods=['GET', 'POST'])
 # def edit_answer(answer_id):
 #     answer = data_manager.get_answer_data_by_id_dm(answer_id)
 #     if flask.request.method == 'GET':

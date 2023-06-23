@@ -26,7 +26,7 @@ def get_question_data_by_id_dm(cursor, question_id):
         FROM question
         WHERE id = %(question_id)s;
         """, {'question_id': question_id})
-  return cursor.fetchone()
+    return cursor.fetchone()
 
 
 
