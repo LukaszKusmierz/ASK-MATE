@@ -169,7 +169,26 @@ def update_question_dm(cursor, title, message, old_image_path, new_image_file, q
                     'image': new_image_path,
                     'question_id': question_id})
 
-   
+
+@connection.connection_handler
+def update_answer_dm(cursor, title, message, old_image_path, new_image_file, answer_id, remove_image):
+    if remove_image:
+        util.delete_image_files(old_image_path)
+    if new_image_file.filename != '':
+        new_image_path = util.save_image(new_image_file)
+    if remove_image and new_image_file.filename == '':
+        new_image_path = old_image_path
+    cursor.execute("""
+        UPDATE answer
+        SET
+            title = %(title)s,
+            message = %(message)s,
+            image = %(image)s
+        WHERE id = %(answer_id)s;""",
+                    {'title': title,
+                    'message': message,
+                    'image': new_image_path,
+                    'answer_id': answer_id})
 
 @connection.connection_handler
 def vote_on_question_dm(cursor, question_id, vote_direction):

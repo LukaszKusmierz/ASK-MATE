@@ -162,9 +162,19 @@ def add_comment_to_answer(answer_id):
 @app.route('/answer/<answer_id>/edit', methods=['GET', 'POST'])
 def edit_answers(answer_id):
     answer = data_manager.get_answers_by_question_id_dm(answer_id)
-    return flask.render_template('edit_answer.html', message=answer)
-
-
+    if flask.request.method == 'GET':
+        return flask.render_template('edit_answer.html', answer=answer)
+    elif flask.request.method == 'POST':
+        title = flask.request.form['title']
+        message = flask.request.form['message']
+        new_image_file = flask.request.files['image']
+        old_image_path = answer['image']
+        remove_image_checkbox = flask.render.form.get('remove_image')
+        if 'image' in flask.request.files and new_image_file != '':
+            delete_image = True
+            data_manager.update_answer_dm()
+        data_manager.update_answer_dm(title, message, new_image_file, old_image_path, remove_image_checkbox)
+    return flask.redirect(f"/answer/{answer_id}")
 
 # @app.route('/answer/<answer_id>/edit', methods=['GET', 'POST'])
 # def edit_answer(answer_id):
