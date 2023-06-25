@@ -427,9 +427,9 @@ def edit_comment(cursor, comment_id, message):
     cursor.execute("""
                     UPDATE comment
                     SET 
-                    message = %(message)s,
+                    message = %(message)s, 
                     submission_time = %(submission_time)s, 
-                    edited_count = COALESCE(edited_count,0) + 1
+                    edited_count = COALESCE(edited_count, 0) + 1
                     WHERE id = %(comment_id)s
                     """, {'comment_id': comment_id,
                           "message": message,
