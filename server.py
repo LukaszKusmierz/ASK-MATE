@@ -161,7 +161,8 @@ def edit_answers(answer_id):
     elif flask.request.method == "POST":
         image_file = flask.request.files['image']
         message = flask.request.form['message']
-        data_manager.update_answer(message, answer_id, image_file)
+        data_manager.update_answer(message, answer_id)
+        data_manager.update_image(answer_id, image_file)
         return flask.redirect(f"/question/{answer['question_id']}")
 
 

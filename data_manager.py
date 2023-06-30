@@ -83,7 +83,7 @@ def add_answer_dm(cursor, message, question_id, image_file):
     submission_time = util.get_time()
     image_path = None
     if image_file.filename != '':
-        image_path = util.save_image_dm(image_file)
+        image_path = util.save_image(image_file)
     cursor.execute("""
         INSERT INTO answer(submission_time, vote_number, message, question_id, image)
         VALUES (%(submission_time)s, %(vote_number)s, %(message)s, %(question_id)s, %(image)s);
@@ -177,20 +177,27 @@ def update_question_dm(cursor, title, message, old_image_path, new_image_file, q
 
 
 @connection.connection_handler
-def update_answer(cursor, message, answer_id, image_file):
-    image_path = None
-    if image_file.filename != '':
-        image_path = util.save_image(image_file)
+def update_answer(cursor, message, answer_id):
     cursor.execute("""
         UPDATE answer
         SET
-            message = %(message)s,
-            image = %(image_path)s
+            message = %(message)s
         WHERE id = %(answer_id)s;""",
                    {'message': message,
-                    'image_path': image_path,
                     'answer_id': answer_id})
 
+
+@connection.connection_handler
+def update_image(cursor, answer_id, image_file):
+    if image_file.filename != '':
+        image_path = util.save_image(image_file)
+        cursor.execute("""
+            UPDATE answer
+            SET
+                image = %(image_path)s
+            WHERE id = %(answer_id)s;""",
+                       {'image_path': image_path,
+                        'answer_id': answer_id})
 
 @connection.connection_handler
 def vote_on_question_dm(cursor, question_id, vote_direction):
