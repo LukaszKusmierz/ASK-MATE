@@ -154,14 +154,10 @@ def delete_answer_by_id(cursor, answer_id):
 @connection.connection_handler
 def update_question(cursor, title, message, question_id, remove_image,
                     new_image_path=None):
-    #  solution for removing pic when checkbox is 'on' or there is new pic uploaded
     if remove_image or new_image_path is not None:
         delete_image_from_question(question_id)
-    # saving new picture in database and as file
     if new_image_path is not None:
-
         update_image_in_question(question_id, new_image_path)
-    #  leaving old pic
     cursor.execute("""
                     UPDATE question 
                     SET 
@@ -445,3 +441,54 @@ def update_comment(cursor, comment_id, message):
                     """, {'comment_id': comment_id,
                           "message": message,
                           'submission_time': submission_time})
+
+
+@connection.connection_handler
+def update_answer(cursor, message, answer_id):
+    cursor.execute("""
+        UPDATE answer
+        SET
+            message = %(message)s
+        WHERE id = %(answer_id)s;""",
+                   {'message': message,
+                    'answer_id': answer_id})
+
+
+@connection.connection_handler
+def update_image(cursor, answer_id, image_file):
+    if image_file.filename != '':
+        image_path = util.save_image(image_file)
+        cursor.execute("""
+            UPDATE answer
+            SET
+                image = %(image_path)s
+            WHERE id = %(answer_id)s;""",
+                       {'image_path': image_path,
+                        'answer_id': answer_id})
+
+
+@connection.connection_handler
+def get_answer_by_id(cursor, answer_id):
+    cursor.execute("""
+                    SELECT *
+                    FROM answer
+                    WHERE id = %(answer_id)s;
+                    """, {'answer_id': answer_id})
+    return cursor.fetchone()
+
+
+@connection.connection_handler
+def delete_tag(cursor,question_id, tag_id):
+    cursor.execute("""
+            DELETE FROM question_tag
+            WHERE question_id = %(question_id)s 
+            AND tag_id = %(tag_id)s;
+            
+            DELETE FROM tag
+            WHERE id = %(tag_id)s
+            AND NOT EXISTS(
+                SELECT 1
+                FROM question_tag
+                WHERE tag_id = %(tag_id)s);
+            """, {'question_id': question_id,
+                  'tag_id': tag_id})

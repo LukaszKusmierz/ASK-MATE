@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}AskMate{% endblock %}</title>
+    <link rel="stylesheet" href="/static/stylesheet.css">
+</head>
+<body>
+
+<div class="buttons">{% block options %}{% endblock %}</div>
+<div class="content-form">
+<h1 class="h1">{% block page_header %}{% endblock %}</h1>
+    {% block body %}{% endblock %}
+</div>
+
+</body>
+</html>

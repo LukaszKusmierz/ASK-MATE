@@ -1,21 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>Add Tags</title>
-    <style>
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
-    </style>
-</head>
-<body>
-<a href="/question/{{ question_id }}">
-    <button>Go back</button>
-</a>
+{% extends 'layout_table.html' %}
+
+{% block title %}Add Tags{% endblock %}
+{% block page_header %}Add Tagsr{% endblock %}
+{% block options %}
+<p>
+     <a href="/question/{{ question_id }}">
+        <button>Go back</button>
+    </a>
+</p>
+{% endblock %}
+{% block body %}
 
 <form action="/question/{{ question_id }}/new_tag" method="POST">
-    <h1>Add Tags</h1>
+<div class="add_edit">
     <ul>
         {% for tag in tags %}
             <li>
@@ -28,13 +25,12 @@
         <li>
             <label>
                 <input type="checkbox" name="new_tag_check_box" value="true">
-                ADD Tag:
+                Add Tags:
                 <input type="text" name="new_tag_name">
             </label>
         </li>
     </ul>
-    <br>
     <button type="submit">Submit</button>
+</div>
 </form>
-</body>
-</html>
+{% endblock %}

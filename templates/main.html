@@ -1,43 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Ask mate</title>
-</head>
-<style>
-        h1 {
-        font-size: 65px;
-        }
+{% extends 'layout.html' %}
 
-    table {
-        border-collapse: collapse;
-        width: 85%;
-        margin: auto;
-        position: relative;
-        top: 55%;
-        transform: translateY(20%);
-    }
+{% block title %}Ask mate search{% endblock %}
 
-    th, td {
-        position: relative;
-        border: 1px solid black;
-        padding: 8px;
-        text-align: center;
-        align-items: center;
-    }
-
-    .thumb a {
-        margin-left: 5px;
-    }
-
-    .search-container {
-        text-align: center;
-        margin-top: 20px;
-    }
-
-</style>
-<body>
-    <h1><a href="/list">ASK MATE</a></h1>
+{% block body %}
+    <h1 class="h1"><a href="/list">Ask mate</a></h1>
     <div class="search-container">
         <form action="/search" method="GET">
             <label for="search">Search:</label>
@@ -75,6 +41,4 @@
             {% endfor %}
         </tbody>
     </table>
-</body>
-</html>
-
+{% endblock %}
