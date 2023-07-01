@@ -235,5 +235,10 @@ def highlight_search_phrase(value, search_phrase):
     return value
 
 
+@app.route('/question/<question_id>/tag/<tag_id>/delete')
+def delete_tag(question_id, tag_id):
+    data_manager.delete_tag(question_id, tag_id)
+    return flask.redirect(f'/question/{question_id}')
+
 if __name__ == '__main__':
     app.run(debug=True)

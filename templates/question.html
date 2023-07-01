@@ -108,6 +108,9 @@
                 <i>Tags: </i>
                 {% for tag in tags %}
                     <button>{{ tag.name }}</button>
+                    <a href="/question/{{question.id}}/tag/{{tag.id}}/delete">
+                    <button>X</button>
+                    </a>
                 {% endfor %}
             {% endif %}
 

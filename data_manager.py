@@ -445,7 +445,17 @@ def edit_comment(cursor, comment_id, message):
                     message = %(message)s, 
                     submission_time = %(submission_time)s, 
                     edited_count = COALESCE(edited_count, 0) + 1
-                    WHERE id = %(comment_id)s
+                    WHERE id = %(comment_id)s;
                     """, {'comment_id': comment_id,
                           "message": message,
                           'submission_time': submission_time})
+@connection.connection_handler
+def delete_tag(cursor,question_id, tag_id):
+    cursor.execute("""
+            DELETE FROM question_tag
+            WHERE question_id = %(question_id)s 
+            AND tag_id = %(tag_id)s;
+            """, {'question_id': question_id,
+                  'tag_id': tag_id})
+
+
