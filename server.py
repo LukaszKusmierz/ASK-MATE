@@ -1,7 +1,6 @@
 from flask import Flask, render_template, redirect, request, url_for
 import data_manager, util
 
-
 app = Flask(__name__)
 
 
@@ -27,8 +26,8 @@ def list_questions():
 
     questions = data_manager.get_sorted_questions(order_by, order) if order and order_by else \
         data_manager.get_sorted_questions("submission_time", "DESC")
-
     return render_template("list.html", questions=questions, columns=columns)
+
 
 @app.route('/question/<question_id>')
 def print_question(question_id):
@@ -221,14 +220,14 @@ def delete_comments(comment_id):
 
 @app.route('/question/<question_id>/delete_image')
 def delete_image_to_question(question_id):
-    image_path= data_manager.delete_image_from_question(question_id)
+    image_path = data_manager.delete_image_from_question(question_id)
     util.delete_image_files([image_path])
     return redirect(f'/question/{question_id}')
 
 
 @app.route('/answer/<answer_id>/delete_image')
 def delete_image_to_answer(answer_id):
-    question_id, image_path= data_manager.delete_image_from_answer(answer_id)
+    question_id, image_path = data_manager.delete_image_from_answer(answer_id)
     util.delete_image_files([image_path])
     return redirect(f'/question/{question_id}')
 
@@ -251,11 +250,17 @@ def highlight_search_phrase(value, search_phrase):
     if search_phrase.lower() not in value.lower():
         return value
 
-    start_index = value.lower().index(search_phrase.lower())
-    stop_index = start_index + len(search_phrase)
-    original_substring = value[start_index:stop_index]
-    highlighted = f'<span style="background-color:lightgreen;">{original_substring}</span>'
-    highlighted_value = f'{value[0:start_index]}{highlighted}{value[stop_index:]}'
+    highlighted_value = value
+    start_index = 0
+    while True:
+        start_index = highlighted_value.lower().find(search_phrase.lower(), start_index)
+        if start_index == -1:
+            break
+        stop_index = start_index + len(search_phrase)
+        original_substring = highlighted_value[start_index:stop_index]
+        highlighted = f'<span style="background-color:lightgreen;">{original_substring}</span>'
+        highlighted_value = f'{highlighted_value[:start_index]}{highlighted}{highlighted_value[stop_index:]}'
+        start_index += len(highlighted)
 
     return highlighted_value
 
@@ -263,7 +268,6 @@ def highlight_search_phrase(value, search_phrase):
 @app.route('/answer/<answer_id>/edit', methods=['GET', 'POST'])
 def update_answers(answer_id):
     answer = data_manager.get_answer_by_id(answer_id)
-
     if request.method == 'GET':
         return render_template('edit_answer.html', answer=answer)
     elif request.method == "POST":
@@ -281,6 +285,7 @@ def update_answers(answer_id):
 def delete_tag(question_id, tag_id):
     data_manager.delete_tag(question_id, tag_id)
     return redirect(f'/question/{question_id}')
+
 
 if __name__ == '__main__':
     app.run(debug=True)

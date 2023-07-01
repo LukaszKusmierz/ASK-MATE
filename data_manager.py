@@ -152,8 +152,7 @@ def delete_answer_by_id(cursor, answer_id):
 
 
 @connection.connection_handler
-def update_question(cursor, title, message, question_id, remove_image,
-                    new_image_path=None):
+def update_question(cursor, title, message, question_id, remove_image, new_image_path=None):
     if remove_image or new_image_path is not None:
         delete_image_from_question(question_id)
     if new_image_path is not None:
@@ -235,7 +234,7 @@ def add_comment_question(cursor, question_id, message):
 @connection.connection_handler
 def get_comments_of_answers(cursor, question_id):
     cursor.execute("""
-                    SELECT c.id, c.answer_id, c.message, c.submission_time, edited_count
+                    SELECT c.id, c.answer_id, c.message, c.submission_time, c.edited_count
                     FROM comment c
                     JOIN answer a on c.answer_id = a.id
                     WHERE a.question_id = %(question_id)s
@@ -478,7 +477,7 @@ def get_answer_by_id(cursor, answer_id):
 
 
 @connection.connection_handler
-def delete_tag(cursor,question_id, tag_id):
+def delete_tag(cursor, question_id, tag_id):
     cursor.execute("""
             DELETE FROM question_tag
             WHERE question_id = %(question_id)s 
