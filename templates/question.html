@@ -2,72 +2,43 @@
 {% block title %}question_&_answers{% endblock %}
 {% block page_header %}Question & Answers{% endblock %}
 {% block options %}
-<div class="menu">
-    <p>
-        <a href="/">
-            <button>Main</button>
-        </a>
-    </p>
-    <p>
-        <a href="/list">
-            <button>List of questions</button>
-        </a>
-    </p>
-    <p>
-        <a href="/tags">
-            <button>List of tags</button>
-        </a>
-    </p>
-    <p>
-        <a href="/question/{{ question.id }}/new_answer">
-            <button>Add new answer</button>
-        </a>
-    </p>
-    <p>
-        <a href='/question/{{ question.id }}/delete'>
-            <button>Delete question</button>
-        </a>
-    </p>
-    <p>
-        <a href='/question/{{ question.id }}/edit'>
-            <button>Edit question</button>
-        </a>
-    </p>
-    <p>
-        <a href='/question/{{ question.id }}/new_comment'>
-            <button>Comment question</button>
-        </a>
-    </p>
-    <p>
-        <a href='/question/{{ question.id }}/new_tag'>
-            <button>Add tag</button>
-        </a>
-    </p>
-</div>
+<nav class="nav-item">
+    <ul>
+        {% if not is_logged %}
+            <a href="/"><button>Main</button></a>
+            <a href="/list"><button>List of questions</button></a>
+        {% else %}
+            <a href="/list"><button>List of questions</button></a>
+            <a href="/question/{{ question.id }}/new_answer"><button>Add new answer</button></a>
+            <a href='/question/{{ question.id }}/delete'><button>Delete question</button></a>
+            <a href='/question/{{ question.id }}/edit'><button>Edit question</button></a>
+            <a href='/question/{{ question.id }}/new_comment'><button>Comment question</button></a>
+            <a href='/question/{{ question.id }}/new_tag'><button>Add tag</button></a>
+            <a href="/user/{{ question.user_id }}"><button>User page</button></a>
+            <a href="/users"><button>Users</button></a>
+            <a href="/logout"><button>Logout</button></a>
+        {% endif %}
+    </ul>
+</nav>
 {% endblock %}
 {% block body %}
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    <ul class="messages">
-      {% for message in messages %}
-        <li class="{{ message[1] }}">{{ message[0] }}</li>
-      {% endfor %}
-    </ul>
-  {% endif %}
-{% endwith %}
 <table>
     <tr>
         <th>Question</th>
+        <th>Vote Number</th>
         <th>Message</th>
         <th>Image</th>
     </tr>
     <tr>
         <td>
+            {{ question['title'] }}
+        </td>
+        <td>
             <div class="votes">
-                {{ question['title'] }}
+                {{ question['vote_number'] }}
                 <div class="thumb">
-                    <a href="/question/{{ question.id }}/vote_up?source=question">&#128077;</a>
-                    <a href="/question/{{ question.id }}/vote_down?source=question">&#128078;</a>
+                    <a href="/question/{{ question.id }}/vote/up?source=question">&#128077;</a>
+                    <a href="/question/{{ question.id }}/vote/down?source=question">&#128078;</a>
                 </div>
             </div>
         </td>
@@ -150,8 +121,8 @@
                 <div class="votes">
                     {{ answer.vote_number }}
                     <div class="thumb">
-                        <a href="/answer/{{ answer.id }}/vote_up">&#128077;</a>
-                        <a href="/answer/{{ answer.id }}/vote_down">&#128078;</a>
+                        <a href="/answer/{{ answer.id }}/vote/up">&#128077;</a>
+                        <a href="/answer/{{ answer.id }}/vote/down">&#128078;</a>
                     </div>
                 </div>
             </td>

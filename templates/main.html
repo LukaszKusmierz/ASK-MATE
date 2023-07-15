@@ -4,21 +4,7 @@
 
 
 {% block body %}
-
-
 <h1><a href="/list">ASK MATE</a></h1>
-
-    <p>
-    <a href="/registration"><button> Registration</button></a>
-    </p>
-    <p>
-    <a href="/login"><button> Login </button></a>
-    </p>
-    <p>
-    <a href="/tags"><button> List of tags</button></a>
-    </p>
-
-
 <div class="search-container">
     <form action="/search" method="GET">
         <label for="search"></label>
@@ -26,6 +12,18 @@
         <button type="submit">Search</button>
     </form>
 </div>
+<nav class="nav-item">
+    <ul>
+        {% if not is_logged %}
+            <a href="/registration"><button>Registration</button></a>
+            <a href="/login"><button>Login</button></a>
+        {% else %}
+            <a href="/user_page"><button>User page</button></a>
+            <a href="/users"><button>Users</button></a>
+            <a href="/logout"><button>Logout</button></a>
+        {% endif %}
+    </ul>
+</nav>
 <table class="main">
     <thead>
         <tr>
