@@ -1,14 +1,23 @@
 {%  extends 'layout_table.html' %}
 {% block title %}User page{% endblock %}
-{% block page_header %}User Profile{% endblock %}
 
-{% block body %}
-    <p><a href="/"><button>Main page</button></a></p>
-    <p><a href="/users"><button>Users</button></a></p>
+{% block header %}
+<h1>ASK MATE</h1>
+{% endblock %}
+
+{% block nav %}
+    <ul>
+         <li><a href="/logout">Log out</a><li>
+         <li><a href="/">Main page</a></li>
+         <li><a href="/users">Users</a></li>
+     </ul>
+{% endblock %}
+
+{% block main %}
 
     {% for data in user_page_data %}
         <h2> {{ data.table_name }} </h2>
-    <table>
+    <table class="main_table">
         <tr>
             {% for header in data.headers %}
             <th>{{ header }}</th>
@@ -17,11 +26,11 @@
         {% for user_row in data.user_data %}
             <tr>
                 {% for user_cell in user_row %}
-                    <td>
+                    <td class="title">
                         {% if user_cell is string and user_cell.startswith('<img') and user_cell.endswith('">') %}
                             {% set image_src = user_cell.split('src="')[1].split('"')[0] %}
                                 {% if image_src %}
-                                    <img src="{{ image_src }}" alt="User picture" style="max-width: 150px;" onerror="this.style.display='none'">
+                                    <img class="image_main" src="{{ image_src }}" alt="User picture"" onerror="this.style.display='none'">
                                 {% endif %}
                         {% else %}
                             {{ user_cell|safe }}
