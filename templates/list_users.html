@@ -1,0 +1,43 @@
+{% extends 'layout_table.html' %}
+{% block title %}Users list{% endblock %}
+
+{% block header %}
+<h1>ASK MATE</h1>
+{% endblock %}
+
+{% block nav %}
+    <ul>
+        <li><a href="/logout">Logout</a><li>
+        <li><a href="/">Main page</a></li>
+    </ul>
+{% endblock %}
+
+{% block main %}
+    <h2>Users List</h2>
+    <table class="main_table" >
+        <thead>
+            <tr>
+                {% for header in LIST_USERS_HEADERS %}
+                <th>
+                    {{ header }}
+                </th>
+                {% endfor %}
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td class="title" ><a href="/user/{{ user.id }}">{{ user.username }}</a>
+                </td>
+                <td>{{ user.registration_date }}</td>
+                <td>{{ user.questions_number }}</td>
+                <td>{{ user.answers_number }}</td>
+                <td>{{ user.comments_number }}</td>
+                <td>{{ user.reputation }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <br><br><br><br><br><br><br>
+{% endblock %}

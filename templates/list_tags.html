@@ -1,0 +1,39 @@
+{% extends 'layout_table.html' %}
+{% block title %}Tags{% endblock %}
+
+{% block header %}
+<h1>ASK MATE</h1>
+{% endblock %}
+
+{% block nav %}
+     <ul>
+         <li><a href="/logout">Log out</a><li>
+         <li><a href="/">Main page</a></li>
+         <li><a href="/users">Users</a></li>
+     </ul>
+{% endblock %}
+
+{% block main %}
+    <h2>List of tags</h2>
+
+    <table class="main_table">
+        <thead>
+            <tr>
+                <th>
+                    Name of tag
+                </th>
+                <th>
+                    Number of questions
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for tag in tags %}
+            <tr>
+                <td>{{ tag.name }}</td>
+                <td>{{ tag.number_of_questions }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

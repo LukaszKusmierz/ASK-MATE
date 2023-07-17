@@ -1,5 +1,114 @@
 import connection
 import util
+from psycopg2.sql import SQL, Identifier
+import config
+
+
+@connection.connection_handler
+def get_user_id_by_question_id(cursor, question_id):
+    cursor.execute("""
+                    SELECT user_id
+                    FROM question
+                    WHERE id = %(question_id)s;
+                    """, {'question_id': question_id})
+    return cursor.fetchone()['user_id']
+
+
+@connection.connection_handler
+def get_user_id_by_answer_id(cursor, answer_id):
+    cursor.execute("""
+                    SELECT user_id
+                    FROM answer
+                    WHERE id = %(answer_id)s;
+                    """, {'answer_id': answer_id})
+    return cursor.fetchone()['user_id']
+
+
+@connection.connection_handler
+def get_user_id_by_comment_id(cursor, comment_id):
+    cursor.execute("""
+                    SELECT user_id
+                    FROM comment
+                    WHERE id = %(comment_id)s;
+                    """, {'comment_id': comment_id})
+    return cursor.fetchone()['user_id']
+
+
+@connection.connection_handler
+def add_user(cursor, username, email, hashed_password):
+    registration_date = util.get_time()
+    cursor.execute("""
+                    INSERT INTO users(username, email, password, registration_date) 
+                    VALUES (%s, %s, %s, %s)
+                    RETURNING id;""",
+                   (username, email, hashed_password, registration_date))
+    return cursor.fetchone()["id"]
+
+
+@connection.connection_handler
+def get_user_by_name(cursor, username, email):
+    cursor.execute("""
+                SELECT * 
+                FROM users
+                WHERE username = %s  OR email = %s    
+                """, (username, email))
+    return cursor.fetchone()
+
+
+@connection.connection_handler
+def get_users_list(cursor):
+    cursor.execute("""
+                    SELECT id, username, registration_date,
+                    (SELECT COUNT(id) FROM question q WHERE u.id = q.user_id) AS questions_number,
+                    (SELECT COUNT(id) FROM answer a WHERE u.id =a.user_id) AS answers_number,
+                    (SELECT COUNT(id) FROM comment c WHERE u.id = c.user_id) AS comments_number,
+                    reputation
+                    FROM users u;
+                    """)
+    return cursor.fetchall()
+
+
+@connection.connection_handler
+def mark_unmark_answer_as_accepted(cursor, answer_id, accepted):
+    cursor.execute("""
+                    UPDATE answer
+                    SET is_accepted = %(accepted)s
+                    WHERE id = %(answer_id)s;
+                    """,
+                   {'answer_id': answer_id, 'accepted': accepted})
+
+
+@connection.connection_handler
+def update_reputation_gained(cursor, answer_id, reputation_gained):
+    cursor.execute("""
+                    UPDATE answer
+                    SET reputation_status = %(reputation_gained)s
+                    WHERE id = %(answer_id)s;
+                    """,
+                   {'answer_id': answer_id, 'reputation_gained': reputation_gained})
+
+
+def get_comments_by_user_id(user_id):
+    return get_entity_by_user_id(user_id, 'comment', ['question_id', 'answer_id', 'message'])
+
+
+def get_answers_by_user_id(user_id):
+    return get_entity_by_user_id(user_id, 'answer', ['id', 'question_id', 'message', 'image'])
+
+
+def get_questions_by_user_id(user_id):
+    return get_entity_by_user_id(user_id, 'question', ['id', 'title', 'message', 'image'])
+
+
+@connection.connection_handler
+def get_entity_by_user_id(cursor, user_id, entity, attributes_list):
+    attributes = SQL(', ').join(Identifier(attribute) for attribute in attributes_list)
+    cursor.execute(SQL("""
+                        SELECT {attributes}
+                        FROM {entity}
+                        WHERE user_id = %(user_id)s;
+                        """).format(attributes=attributes, entity=Identifier(entity)), {'user_id': user_id})
+    return cursor.fetchall()
 
 
 @connection.connection_handler
@@ -17,13 +126,7 @@ def get_sorted_questions(cursor, order_by, order_direction, questions=None):
                         """)
         return cursor.fetchall()
     else:
-        order_by_column = {
-            'submission_time': 'submission_time',
-            'view_number': 'view_number',
-            'vote_number': 'vote_number',
-            'title': 'title',
-            'message': 'message'
-        }
+        order_by_column = config.ORDER_COL_GET_SORTED_Q
         order_by = order_by_column.get(order_by)
         if order_by is None:
             raise Exception('Wrong order by query.')
@@ -62,55 +165,42 @@ def get_answers_by_question_id(cursor, question_id):
 
 
 @connection.connection_handler
-def add_question(cursor, title, message, image_path):
+def add_question(cursor, title, message, image_path, user_id):
     submission_time = util.get_time()
     cursor.execute("""
-                    INSERT INTO question(submission_time, view_number, vote_number, title, message)
-                    VALUES (%(submission_time)s, %(view_number)s, %(vote_number)s, %(title)s, %(message)s)
+                    INSERT INTO question(submission_time, view_number, vote_number, title, message, user_id)
+                    VALUES (%(submission_time)s, %(view_number)s, %(vote_number)s, %(title)s, %(message)s, %(user_id)s)
                     RETURNING id;""",
                    {'submission_time': submission_time,
                     'vote_number': 0,
                     'view_number': 0,
                     'title': title,
-                    'message': message})
+                    'message': message,
+                    'user_id': user_id})
     new_question_id = cursor.fetchone()['id']
     update_image_in_question(new_question_id, image_path)
     return new_question_id
 
 
 @connection.connection_handler
-def add_answer(cursor, message, question_id, image_path):
+def add_answer(cursor, message, question_id, image_path, user_id):
     submission_time = util.get_time()
     cursor.execute("""
-                    INSERT INTO answer(submission_time, vote_number, message, question_id, image)
-                    VALUES (%(submission_time)s, %(vote_number)s, %(message)s, %(question_id)s, %(image)s);
+                    INSERT INTO answer(submission_time, vote_number, message, question_id, image, user_id)
+                    VALUES (%(submission_time)s, %(vote_number)s, %(message)s, %(question_id)s, %(image)s, %(user_id)s);
                     """,
                    {'submission_time': submission_time,
                     'vote_number': 0,
                     'message': message,
                     'question_id': question_id,
-                    'image': image_path})
+                    'image': image_path,
+                    'user_id': user_id})
 
 
 @connection.connection_handler
 def delete_question(cursor, question_id):
     image_paths = get_image_paths(question_id)
-    cursor.execute("""
-                    DELETE FROM comment
-                    WHERE answer_id IN
-                    (SELECT answer_id
-                    FROM answer
-                    WHERE question_id = %(question_id)s);
-            
-                    DELETE FROM answer
-                    WHERE question_id = %(question_id)s;
-            
-                    DELETE FROM comment
-                    WHERE question_id = %(question_id)s;
-            
-                    DELETE FROM question_tag
-                    WHERE question_id = %(question_id)s;
-            
+    cursor.execute("""          
                     DELETE FROM question
                     WHERE id = %(question_id)s;
                     """, {'question_id': question_id})
@@ -200,12 +290,18 @@ def vote_on_answer(cursor, answer_id, vote_direction):
                         WHEN %(vote_direction)s = 'down' THEN vote_number - 1
                         ELSE vote_number
                     END
-                    WHERE id = %(answer_id)s
-                    RETURNING question_id;
+                    WHERE id = %(answer_id)s;
                     """, {'answer_id': answer_id,
                           'vote_direction': vote_direction})
-    question_id = cursor.fetchone()['question_id']
-    return question_id
+
+
+@connection.connection_handler
+def change_reputation(cursor, number, user_id):
+    cursor.execute("""
+            UPDATE users
+            SET reputation = reputation + %(number)s
+            WHERE id = %(user_id)s
+            """, {'number': number, 'user_id': user_id})
 
 
 @connection.connection_handler
@@ -220,14 +316,15 @@ def get_comments_by_question_id(cursor, question_id):
 
 
 @connection.connection_handler
-def add_comment_question(cursor, question_id, message):
+def add_comment_question(cursor, question_id, message, user_id):
     submission_time = util.get_time()
     cursor.execute("""
-                    INSERT INTO comment(question_id, message,submission_time)
-                    VALUES (%(question_id)s, %(message)s, %(submission_time)s);
+                    INSERT INTO comment(question_id, message,submission_time, user_id)
+                    VALUES (%(question_id)s, %(message)s, %(submission_time)s, %(user_id)s);
                     """, {'question_id': question_id,
                           'message': message,
-                          'submission_time': submission_time})
+                          'submission_time': submission_time,
+                          'user_id': user_id})
 
 
 @connection.connection_handler
@@ -243,18 +340,19 @@ def get_comments_of_answers(cursor, question_id):
 
 
 @connection.connection_handler
-def add_comment_to_answer(cursor, answer_id, message):
+def add_comment_to_answer(cursor, answer_id, message, user_id):
     submission_time = util.get_time()
     cursor.execute("""
-                    INSERT INTO comment(answer_id, message, submission_time)
-                    VALUES (%(answer_id)s, %(message)s, %(submission_time)s);
+                    INSERT INTO comment(answer_id, message, submission_time, user_id)
+                    VALUES (%(answer_id)s, %(message)s, %(submission_time)s, %(user_id)s);
                     
                     SELECT question_id
                     FROM answer
                     WHERE id = %(answer_id)s;
                     """, {'answer_id': answer_id,
                           'message': message,
-                          'submission_time': submission_time})
+                          'submission_time': submission_time,
+                          'user_id': user_id})
     question_id = cursor.fetchone()['question_id']
     return question_id
 
@@ -273,9 +371,11 @@ def delete_comment(cursor, comment_id):
 @connection.connection_handler
 def get_tags(cursor):
     cursor.execute("""
-                    SELECT *
-                    FROM tag;
-                        """)
+                    SELECT t.name, COUNT(q.question_id) AS number_of_questions
+                    FROM tag t
+                    LEFT JOIN question_tag q on t.id = q.tag_id
+                    GROUP BY t.id, t.name;
+                    """)
     tags = cursor.fetchall()
     return tags
 
@@ -303,6 +403,32 @@ def get_question_id_by_answer_id(cursor, answer_id):
                    {'answer_id': answer_id})
     question_id = cursor.fetchone()['question_id']
     return question_id
+
+
+@connection.connection_handler
+def get_question_id_by_comment_id(cursor, comment_id):
+    cursor.execute("""
+                    SELECT question_id
+                    FROM comment
+                    WHERE id = %(comment_id)s;
+                    """,
+                   {'comment_id': comment_id})
+    result = cursor.fetchone()
+    if result:
+        return result['question_id']
+    else:
+        return None
+
+
+@connection.connection_handler
+def get_answer_id_by_comment_id(cursor, comment_id):
+    cursor.execute("""
+                    SELECT answer_id
+                    FROM comment
+                    WHERE id = %(comment_id)s;
+                    """,
+                   {'comment_id': comment_id})
+    return cursor.fetchone()['answer_id']
 
 
 @connection.connection_handler
