@@ -1,84 +1,44 @@
 {%  extends 'layout_table.html' %}
 {% block title %}User page{% endblock %}
-{% block page_header %}User Profile{% endblock %}
 
-{% block options %}
-    <p><a href="/"><button>Main page</button></a></p>
-    <p><a href="/users"><button>Users</button></a></p>
+{% block header %}
+<h1>ASK MATE</h1>
+{% endblock %}
 
+{% block nav %}
+    <ul>
+         <li><a href="/logout">Log out</a><li>
+         <li><a href="/">Main page</a></li>
+         <li><a href="/users">Users</a></li>
+     </ul>
+{% endblock %}
 
-    <h2>User Details</h2>
-    <table>
-        <tr>
-            <th>User ID</th>
-            <th>Username</th>
-            <th>Registration Date</th>
-            <th>Number of Asked Questions</th>
-            <th>Number of Answers</th>
-            <th>Number of Comments</th>
-            <th>Reputation</th>
-        </tr>
-        <tr>
-            <td>{{ user.id }}</td>
-            <td>{{ user.username }}</td>
-            <td>{{ user.registration_date }}</td>
-            <td>{{ user.questions_number }}</td>
-            <td>{{ user.answers_number }}</td>
-            <td>{{ user.comments_number }}</td>
-            <td>{{ user.reputation }}</td>
-        </tr>
-    </table>
+{% block main %}
 
-    <h2>Questions</h2>
-    <table>
+    {% for data in user_page_data %}
+        <h2> {{ data.table_name }} </h2>
+    <table class="main_table">
         <tr>
-            <th>Title</th>
-            <th>Message</th>
-            <th>Image</th>
+            {% for header in data.headers %}
+            <th>{{ header }}</th>
+            {% endfor %}
         </tr>
-        {% for question in questions %}
-        <tr>
-            <td><a href="/question/{{ question.id }}">{{ question.title }}</a></td>
-            <td>{{ question.message }}</td>
-            <td>
-                {% if question.image %}
-                    <img src="../{{ question.image }}" alt="Question Image" style="max-width: 150px;">
-                {% endif %}
-            </td>
-        </tr>
+        {% for user_row in data.user_data %}
+            <tr>
+                {% for user_cell in user_row %}
+                    <td class="title">
+                        {% if user_cell is string and user_cell.startswith('<img') and user_cell.endswith('">') %}
+                            {% set image_src = user_cell.split('src="')[1].split('"')[0] %}
+                                {% if image_src %}
+                                    <img class="image_main" src="{{ image_src }}" alt="User picture"" onerror="this.style.display='none'">
+                                {% endif %}
+                        {% else %}
+                            {{ user_cell|safe }}
+                        {% endif %}
+                    </td>
+                {% endfor %}
+            </tr>
         {% endfor %}
     </table>
-
-    <h2>Answers</h2>
-    <table>
-        <tr>
-            <th>Message</th>
-            <th>Image</th>
-        </tr>
-        {% for answer in answers %}
-            {% while True %}
-            {% endwhile %}
-        <tr>
-            <td><a href="/question/{{ answer.question_id }}">{{ answer.message }}</a></td>
-            <td>
-                {% if answer.image %}
-                    <img src="../{{ answer.image }}" alt="Question Image" style="max-width: 150px;">
-                {% endif %}
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
-
-    <h2>Comments</h2>
-    <table>
-        <tr>
-            <th>Message</th>
-        </tr>
-        {% for comment in comments %}
-        <tr>
-            <td><a href="/question/{{ comment.question_id }}">{{ comment.message }}</a></td>
-        </tr>
-        {% endfor %}
-    </table>
-
+    {% endfor %}
 {% endblock %}
