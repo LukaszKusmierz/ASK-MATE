@@ -23,7 +23,7 @@ SET row_security = off;
 CREATE DATABASE askmate WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE_PROVIDER = libc LOCALE = 'Polish_Poland.1250';
 
 
-ALTER DATABASE askmate OWNER TO askmate2;
+ALTER DATABASE askmate OWNER TO postgres;
 
 \connect askmate
 
@@ -59,7 +59,7 @@ CREATE TABLE public.answer (
 );
 
 
-ALTER TABLE public.answer OWNER TO askmate2;
+ALTER TABLE public.answer OWNER TO postgres;
 
 --
 -- Name: answer_id_seq; Type: SEQUENCE; Schema: public; Owner: askmate2
@@ -74,7 +74,7 @@ CREATE SEQUENCE public.answer_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.answer_id_seq OWNER TO askmate2;
+ALTER TABLE public.answer_id_seq OWNER TO postgres;
 
 --
 -- Name: answer_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: askmate2
@@ -98,7 +98,7 @@ CREATE TABLE public.comment (
 );
 
 
-ALTER TABLE public.comment OWNER TO askmate2;
+ALTER TABLE public.comment OWNER TO postgres;
 
 --
 -- Name: comment_id_seq; Type: SEQUENCE; Schema: public; Owner: askmate2
@@ -113,7 +113,7 @@ CREATE SEQUENCE public.comment_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.comment_id_seq OWNER TO askmate2;
+ALTER TABLE public.comment_id_seq OWNER TO postgres;
 
 --
 -- Name: comment_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: askmate2
@@ -138,7 +138,7 @@ CREATE TABLE public.question (
 );
 
 
-ALTER TABLE public.question OWNER TO askmate2;
+ALTER TABLE public.question OWNER TO postgres;
 
 --
 -- Name: question_id_seq; Type: SEQUENCE; Schema: public; Owner: askmate2
@@ -153,7 +153,7 @@ CREATE SEQUENCE public.question_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.question_id_seq OWNER TO askmate2;
+ALTER TABLE public.question_id_seq OWNER TO postgres;
 
 --
 -- Name: question_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: askmate2
@@ -172,7 +172,7 @@ CREATE TABLE public.question_tag (
 );
 
 
-ALTER TABLE public.question_tag OWNER TO askmate2;
+ALTER TABLE public.question_tag OWNER TO postgres;
 
 --
 -- Name: tag; Type: TABLE; Schema: public; Owner: askmate2
@@ -184,7 +184,7 @@ CREATE TABLE public.tag (
 );
 
 
-ALTER TABLE public.tag OWNER TO askmate2;
+ALTER TABLE public.tag OWNER TO postgres;
 
 --
 -- Name: tag_id_seq; Type: SEQUENCE; Schema: public; Owner: askmate2
@@ -199,7 +199,7 @@ CREATE SEQUENCE public.tag_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.tag_id_seq OWNER TO askmate2;
+ALTER TABLE public.tag_id_seq OWNER TO postgres;
 
 --
 -- Name: tag_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: askmate2
@@ -222,7 +222,7 @@ CREATE TABLE public.users (
 );
 
 
-ALTER TABLE public.users OWNER TO askmate2;
+ALTER TABLE public.users OWNER TO postgres;
 
 --
 -- Name: users_user_id_seq; Type: SEQUENCE; Schema: public; Owner: askmate2
@@ -237,7 +237,7 @@ CREATE SEQUENCE public.users_user_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.users_user_id_seq OWNER TO askmate2;
+ALTER TABLE public.users_user_id_seq OWNER TO postgres;
 
 --
 -- Name: users_user_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: askmate2
