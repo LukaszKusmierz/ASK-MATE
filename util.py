@@ -7,11 +7,11 @@ from functools import wraps
 import config
 import data_manager
 
-ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif']
+
 
 
 def allowed_file(filename):
-    return filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    return filename.rsplit('.', 1)[1].lower() in config.ALLOWED_EXTENSIONS
 
 
 def save_image(image_file):

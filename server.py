@@ -245,17 +245,17 @@ def update_question(question_id):
         return redirect(f'/question/{question_id}')
 
 
-@app.route('/question/<question_id>/vote/<direction>')
+@app.route('/question/<question_id>/<direction>')
 @util.is_logged_in
 def vote_on_question(question_id, direction):
     source = request.args.get('source')
     question = data_manager.get_question_data_by_id(question_id)
 
-    if direction == 'up':
-        data_manager.vote_on_question(question_id, 'up')
+    if direction == 'vote_up':
+        data_manager.vote_on_question(question_id, direction)
         data_manager.change_reputation(config.GAIN_REPUTATION_QUESTION, question['user_id'])
-    elif direction == 'down':
-        data_manager.vote_on_question(question_id, 'down')
+    elif direction == 'vote_down':
+        data_manager.vote_on_question(question_id, direction)
         data_manager.change_reputation(config.LOSE_REPUTATION, question['user_id'])
 
     if source == 'question':
@@ -267,15 +267,15 @@ def vote_on_question(question_id, direction):
         return redirect('/list')
 
 
-@app.route('/answer/<answer_id>/vote/<direction>')
+@app.route('/answer/<answer_id>/<direction>')
 @util.is_logged_in
 def vote_on_answer(answer_id, direction):
     answer = data_manager.get_answer_by_id(answer_id)
-    if direction == 'up':
-        data_manager.vote_on_answer(answer_id, "up")
+    if direction == 'vote_up':
+        data_manager.vote_on_answer(answer_id, direction)
         data_manager.change_reputation(config.GAIN_REPUTATION_ANSWER, answer['user_id'])
-    elif direction == 'down':
-        data_manager.vote_on_answer(answer_id, "down")
+    elif direction == 'vote_down':
+        data_manager.vote_on_answer(answer_id, direction)
         data_manager.change_reputation(config.LOSE_REPUTATION, answer['user_id'])
 
     return redirect(f"/question/{answer['question_id']}")

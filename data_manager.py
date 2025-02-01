@@ -102,13 +102,20 @@ def get_questions_by_user_id(user_id):
 
 @connection.connection_handler
 def get_entity_by_user_id(cursor, user_id, entity, attributes_list):
-    attributes = SQL(', ').join(Identifier(attribute) for attribute in attributes_list)
-    cursor.execute(SQL("""
-                        SELECT {attributes}
-                        FROM {entity}
-                        WHERE user_id = %(user_id)s;
-                        """).format(attributes=attributes, entity=Identifier(entity)), {'user_id': user_id})
-    return cursor.fetchall()
+    if entity not in config.ALLOWED_ENTITIES:
+        raise ValueError(f"Invalid entity name: {entity}")
+
+    try:
+        attributes = SQL(', ').join(Identifier(attribute) for attribute in attributes_list)
+        cursor.execute(SQL("""
+                            SELECT {attributes}
+                            FROM {entity}
+                            WHERE user_id = %(user_id)s;
+                            """).format(attributes=attributes, entity=Identifier(entity)), {'user_id': user_id})
+        return cursor.fetchall()
+    except Exception as e:
+        print(f"Database query error: {e}")
+        return []
 
 
 @connection.connection_handler
@@ -272,8 +279,8 @@ def vote_on_question(cursor, question_id, vote_direction):
     cursor.execute("""
                     UPDATE question 
                     SET vote_number = CASE
-                        WHEN %(vote_direction)s = 'up' THEN vote_number + 1
-                        WHEN %(vote_direction)s = 'down' THEN vote_number - 1
+                        WHEN %(vote_direction)s = 'vote_up' THEN vote_number + 1
+                        WHEN %(vote_direction)s = 'vote_down' THEN vote_number - 1
                         ELSE vote_number
                     END
                     WHERE id = %(question_id)s;""",
@@ -286,8 +293,8 @@ def vote_on_answer(cursor, answer_id, vote_direction):
     cursor.execute("""
                     UPDATE answer 
                     SET vote_number = CASE
-                        WHEN %(vote_direction)s = 'up' THEN vote_number + 1
-                        WHEN %(vote_direction)s = 'down' THEN vote_number - 1
+                        WHEN %(vote_direction)s = 'vote_up' THEN vote_number + 1
+                        WHEN %(vote_direction)s = 'vote_down' THEN vote_number - 1
                         ELSE vote_number
                     END
                     WHERE id = %(answer_id)s;

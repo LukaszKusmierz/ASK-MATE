@@ -49,3 +49,7 @@ ORDER_COL_GET_SORTED_Q = {
             'title': 'title',
             'message': 'message'
 }
+
+ALLOWED_ENTITIES = {"question", "answer", "comment"}
+
+ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif']
