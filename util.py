@@ -8,8 +8,6 @@ import config
 import data_manager
 
 
-
-
 def allowed_file(filename):
     return filename.rsplit('.', 1)[1].lower() in config.ALLOWED_EXTENSIONS
 

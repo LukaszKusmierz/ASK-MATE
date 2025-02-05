@@ -9,8 +9,7 @@ const INITIAL_TABLE_DATA = {}
 function getTableElements(headerId, bodyId) {
     const headings = getColumnNames(headerId)
     const rows = getRowValues(bodyId)
-    const data = buildObjects(rows, headings)
-    return data
+    return buildObjects(rows, headings)
 }
 
 function getColumnNames(headerId) {
@@ -64,8 +63,7 @@ function replaceTableRowsWith(newRows, tableBodyId, tableHeaderId) {
             for (let j = 0; j < columnsNumber; j++) {
                 if (j < Object.keys(newRows[i]).length && j < headers.length) {
                     const cell = tableRows[i].children[j]
-                    const matchingValueWithCurrentCell = newRows[i][Object.keys(newRows[i])[j]]
-                    cell.innerText = matchingValueWithCurrentCell
+                    cell.innerText = newRows[i][Object.keys(newRows[i])[j]]
                 }
             }
         } else {
